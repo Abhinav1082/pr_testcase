@@ -51,6 +51,6 @@ jobs:
           AICORE_AUTH_URL: ${{ secrets.SAP_AI_CORE_AUTH_URL }}
           AICORE_CLIENT_ID: ${{ secrets.SAP_AI_CORE_CLIENT_ID }}
           AICORE_CLIENT_SECRET: ${{ secrets.SAP_AI_CORE_CLIENT_SECRET }}
-          AICORE_API_BASE: ${{ secrets.SAP_AI_CORE_API_BASE }}
+          AICORE_BASE_URL: ${{ secrets.SAP_AI_CORE_API_BASE }}
           AICORE_RESOURCE_GROUP: ${{ secrets.SAP_AI_CORE_RESOURCE_GROUP }}
         run: python scripts/main.py

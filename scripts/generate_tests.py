@@ -8,9 +8,6 @@ import os
 import re
 from dataclasses import dataclass
 
-from gen_ai_hub.proxy.core.proxy_clients import get_proxy_client
-from gen_ai_hub.proxy.native.openai import chat
-
 from scripts.fetch_pr_diff import PRInfo
 from scripts.prompts.test_generation import build_test_generation_prompt
 
@@ -170,7 +167,8 @@ def generate_tests(
         response_text = None
         for attempt in range(max_retries + 1):
             try:
-                proxy_client = get_proxy_client("gen-ai-hub")
+                from gen_ai_hub.proxy.native.openai import chat
+
                 response = chat.completions.create(
                     model_name=model_name,
                     messages=messages,
