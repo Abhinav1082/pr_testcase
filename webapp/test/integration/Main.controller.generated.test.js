@@ -13,8 +13,23 @@ sap.ui.define([
         }
     });
 
-    QUnit.test("Should show confirmation dialog on delete", function (assert) {
+    QUnit.test("Should add item and show MessageToast", function (assert) {
         // Arrange
+        var oModel = new sap.ui.model.json.JSONModel({ itemCount: 0 });
+        this.oController.getView().setModel(oModel, "view");
+
+        // Act
+        this.oController.onAddItem();
+
+        // Assert
+        assert.strictEqual(oModel.getProperty("/itemCount"), 1, "Item count should be incremented");
+        assert.ok(sap.m.MessageToast.show.calledWith("Item added successfully"), "MessageToast should be shown");
+    });
+
+    QUnit.test("Should delete item with confirmation dialog", function (assert) {
+        // Arrange
+        var oModel = new sap.ui.model.json.JSONModel({ itemCount: 1 });
+        this.oController.getView().setModel(oModel, "view");
         var oEvent = {
             getParameter: function () {
                 return {
@@ -33,26 +48,7 @@ sap.ui.define([
         this.oController.onDeleteItem(oEvent);
 
         // Assert
-        assert.ok(true, "Confirmation dialog should be shown");
-    });
-
-    QUnit.test("Should update item count after deletion", function (assert) {
-        // Arrange
-        var oModel = new sap.ui.model.json.JSONModel({
-            itemCount: 5
-        });
-        this.oController.getView = function () {
-            return {
-                getModel: function () {
-                    return oModel;
-                }
-            };
-        };
-
-        // Act
-        this.oController._updateItemCount();
-
-        // Assert
-        assert.strictEqual(oModel.getProperty("/itemCount"), 4, "Item count should be decremented");
+        assert.ok(sap.m.MessageBox.confirm.calledOnce, "Confirmation dialog should be shown");
+        assert.ok(sap.m.MessageToast.show.calledWith("Item deleted successfully"), "MessageToast should be shown after deletion");
     });
 });
