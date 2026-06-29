@@ -165,10 +165,9 @@ def run_tests(repo_root: str, settings: dict) -> TestResult:
             with open(package_json_path, "r") as f:
                 pkg = json.load(f)
             scripts = pkg.get("scripts", {})
-            # Prefer specific test scripts if available
-            if "test:unit" in scripts and "test:integration" in scripts:
-                test_cmd = ["npm", "run", "test:unit", "&&", "npm", "run", "test:integration"]
-            elif "test" in scripts:
+            # Use the basic test command (Karma will use the testsuite which now
+            # includes the generated tests page)
+            if "test" in scripts:
                 test_cmd = ["npm", "test"]
             else:
                 logger.warning("No test script found in package.json")

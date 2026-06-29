@@ -37,6 +37,12 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      - name: Install Chrome for Karma tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable || true
+          echo "CHROME_BIN=$(which google-chrome-stable || which google-chrome || which chromium-browser)" >> $GITHUB_ENV
+
       - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
@@ -53,4 +59,5 @@ jobs:
           AICORE_CLIENT_SECRET: ${{ secrets.SAP_AI_CORE_CLIENT_SECRET }}
           AICORE_BASE_URL: ${{ secrets.SAP_AI_CORE_API_BASE }}
           AICORE_RESOURCE_GROUP: ${{ secrets.SAP_AI_CORE_RESOURCE_GROUP }}
+          CHROME_BIN: ${{ env.CHROME_BIN }}
         run: python scripts/main.py
