@@ -1,0 +1,54 @@
+<mvc:View
+    controllerName="com.demo.fioriapp.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:semantic="sap.f.semantic">
+
+    <semantic:SemanticPage
+        id="mainPage"
+        headerPinnable="false"
+        toggleHeaderOnTitleClick="false"
+        showFooter="false">
+
+        <semantic:titleHeading>
+            <Title text="{i18n>appTitle}" level="H2"/>
+        </semantic:titleHeading>
+
+        <semantic:headerContent>
+            <ObjectNumber
+                number="{view>/itemCount}"
+                unit="Items"
+                emphasized="false"/>
+        </semantic:headerContent>
+
+        <semantic:content>
+            <VBox class="sapUiSmallMargin">
+                <SearchField
+                    id="searchField"
+                    search=".onSearch"
+                    liveChange=".onSearch"
+                    placeholder="{i18n>searchPlaceholder}"
+                    width="100%"/>
+
+                <List
+                    id="itemList"
+                    items="{/Items}"
+                    noDataText="{i18n>noDataText}"
+                    busy="{view>/busy}"
+                    growing="true"
+                    growingThreshold="20">
+                    <StandardListItem
+                        title="{Name}"
+                        description="{Description}"
+                        type="Navigation"
+                        press=".onItemPress"/>
+                </List>
+            </VBox>
+        </semantic:content>
+
+        <semantic:addAction>
+            <semantic:AddAction press=".onAddItem"/>
+        </semantic:addAction>
+
+    </semantic:SemanticPage>
+</mvc:View>

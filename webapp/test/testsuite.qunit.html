@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>QUnit Test Suite</title>
+    <script
+        id="sap-ui-bootstrap"
+        src="https://sdk.openui5.org/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-resourceroots='{
+            "com.demo.fioriapp": "../"
+        }'
+        data-sap-ui-async="true">
+    </script>
+    <script>
+        sap.ui.require(["sap/ui/test/TestSuite"], function (TestSuite) {
+            "use strict";
+            var oSuite = new TestSuite();
+            oSuite.addTestPage("test/unit/unitTests.qunit.html");
+            oSuite.addTestPage("test/integration/opaTests.qunit.html");
+            return oSuite;
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

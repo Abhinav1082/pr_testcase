@@ -1,0 +1,84 @@
+{
+    "sap.app": {
+        "id": "com.demo.fioriapp",
+        "type": "application",
+        "title": "Demo Fiori App",
+        "description": "A demo Fiori application for automated testing",
+        "applicationVersion": {
+            "version": "1.0.0"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "/sap/opu/odata/sap/DEMO_SRV/",
+                "type": "OData",
+                "settings": {
+                    "odataVersion": "2.0"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "sap-icon://task"
+        }
+    },
+    "sap.ui5": {
+        "rootView": {
+            "viewName": "com.demo.fioriapp.view.App",
+            "type": "XML",
+            "id": "appView"
+        },
+        "models": {
+            "": {
+                "dataSource": "mainService",
+                "settings": {}
+            },
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "com.demo.fioriapp.i18n.i18n"
+                }
+            }
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "viewPath": "com.demo.fioriapp.view",
+                "controlId": "appContainer",
+                "controlAggregation": "pages"
+            },
+            "routes": [
+                {
+                    "name": "main",
+                    "pattern": "",
+                    "target": "main"
+                },
+                {
+                    "name": "detail",
+                    "pattern": "detail/{id}",
+                    "target": "detail"
+                }
+            ],
+            "targets": {
+                "main": {
+                    "viewName": "Main",
+                    "viewLevel": 1
+                },
+                "detail": {
+                    "viewName": "Detail",
+                    "viewLevel": 2
+                }
+            }
+        },
+        "dependencies": {
+            "minUI5Version": "1.120.0",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.ui.layout": {}
+            }
+        }
+    }
+}

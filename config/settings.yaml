@@ -1,0 +1,40 @@
+# Automated PR Test Generation Settings
+
+# File patterns to consider as testable Fiori source files
+fiori_file_patterns:
+  - "*.controller.js"
+  - "*.controller.ts"
+  - "*.view.xml"
+  - "*.fragment.xml"
+  - "**/model/*.js"
+  - "**/model/*.ts"
+  - "**/formatter.js"
+  - "**/formatter.ts"
+  - "Component.js"
+  - "Component.ts"
+  - "**/manifest.json"
+
+# Test output configuration
+test_output:
+  # Tests are written directly into integration test folder
+  directory: "webapp/test/integration"
+  # Suffix for generated test files (to distinguish from manual tests)
+  suffix: ".generated.test"
+
+# SAP AI Core / Generative AI Hub configuration
+llm:
+  model_name: "gpt-4"
+  max_tokens: 4096
+  temperature: 0.2
+  # Maximum number of files to process in a single LLM call
+  chunk_size: 5
+  # Retry on failure
+  max_retries: 1
+
+# PR behavior
+pr:
+  # Skip workflow if commit author matches (prevents infinite loops)
+  skip_authors:
+    - "github-actions[bot]"
+  # Comment tag to identify bot comments (for updating instead of duplicating)
+  comment_tag: "<!-- auto-test-bot -->"
