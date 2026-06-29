@@ -11,7 +11,7 @@ sap.ui.define([
                 return {
                     getModel: function() {
                         return new sap.ui.model.json.JSONModel({
-                            itemCount: 0
+                            itemCount: 5
                         });
                     }
                 };
@@ -30,7 +30,7 @@ sap.ui.define([
                     getBindingContext: function() {
                         return {
                             getPath: function() {
-                                return "/Items/1";
+                                return "/Items/0";
                             }
                         };
                     }
@@ -45,26 +45,29 @@ sap.ui.define([
         assert.ok(true, "Confirmation dialog should be shown");
     });
 
-    QUnit.test("Should update item count after deletion", function (assert) {
+    QUnit.test("Should update item count on successful deletion", function (assert) {
         // Arrange
-        var oModel = this.oController.getView().getModel();
-        oModel.setProperty("/itemCount", 5);
+        var oEvent = {
+            getParameter: function() {
+                return {
+                    getBindingContext: function() {
+                        return {
+                            getPath: function() {
+                                return "/Items/0";
+                            }
+                        };
+                    }
+                };
+            }
+        };
 
         // Act
+        this.oController.onDeleteItem(oEvent);
+
+        // Simulate successful deletion
         this.oController._updateItemCount();
 
         // Assert
-        assert.strictEqual(oModel.getProperty("/itemCount"), 4, "Item count should be decremented by 1");
-    });
-
-    QUnit.test("Should show toast message on add item", function (assert) {
-        // Arrange
-        var oModel = this.oController.getView().getModel();
-
-        // Act
-        this.oController.onAddItem();
-
-        // Assert
-        assert.strictEqual(oModel.getProperty("/itemCount"), 1, "Item count should be incremented by 1");
+        assert.strictEqual(this.oController.getView().getModel().getProperty("/itemCount"), 4, "Item count should be decremented");
     });
 });

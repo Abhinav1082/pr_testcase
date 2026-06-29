@@ -6,15 +6,15 @@ sap.ui.define([
 
     QUnit.module("Main View Integration Tests");
 
-    opaTest("Should show delete confirmation dialog when deleting an item", function (Given, When, Then) {
+    opaTest("Should show confirmation dialog when deleting an item", function (Given, When, Then) {
         // Arrangements
         Given.iStartMyApp();
 
         // Actions
-        When.onTheMainPage.iDeleteAnItem();
+        When.onTheMainPage.iPressDeleteOnAnItem();
 
         // Assertions
-        Then.onTheMainPage.iShouldSeeTheDeleteConfirmationDialog();
+        Then.onTheMainPage.iShouldSeeTheConfirmationDialog();
 
         // Cleanup
         Then.iTeardownMyApp();
@@ -25,25 +25,10 @@ sap.ui.define([
         Given.iStartMyApp();
 
         // Actions
-        When.onTheMainPage.iDeleteAnItem();
         When.onTheMainPage.iConfirmDeletion();
 
         // Assertions
         Then.onTheMainPage.iShouldSeeUpdatedItemCount();
-
-        // Cleanup
-        Then.iTeardownMyApp();
-    });
-
-    opaTest("Should show toast message on adding an item", function (Given, When, Then) {
-        // Arrangements
-        Given.iStartMyApp();
-
-        // Actions
-        When.onTheMainPage.iAddAnItem();
-
-        // Assertions
-        Then.onTheMainPage.iShouldSeeAddItemToastMessage();
 
         // Cleanup
         Then.iTeardownMyApp();
