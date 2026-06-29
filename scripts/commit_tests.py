@@ -60,7 +60,7 @@ def commit_tests(written_files: list[str], pr_number: int, repo_root: str) -> bo
             return False
 
         # Commit
-        commit_msg = f"chore: add auto-generated OPA5/QUnit tests for PR #{pr_number}"
+        commit_msg = f"chore: add auto-generated OPA5/QUnit tests for PR #{pr_number} [skip ci]"
         subprocess.run(
             ["git", "commit", "-m", commit_msg],
             cwd=repo_root,
