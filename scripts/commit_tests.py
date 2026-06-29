@@ -38,6 +38,15 @@ def commit_tests(written_files: list[str], pr_number: int, repo_root: str) -> bo
                 text=True,
             )
 
+        # Also stage any generated loader/suite files
+        subprocess.run(
+            ["git", "add", "--all", "webapp/test/"],
+            cwd=repo_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
         # Check if there are staged changes
         result = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],

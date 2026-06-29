@@ -224,4 +224,138 @@ def write_tests_to_disk(
         written_files.append(rel_path)
         logger.info(f"Wrote test file: {rel_path}")
 
+    # Register generated tests in the test suite files
+    _register_tests_in_suite(tests, repo_root, test_dir_rel)
+
     return written_files
+
+
+def _register_tests_in_suite(
+    tests: list[GeneratedTest], repo_root: str, test_dir_rel: str
+) -> None:
+    """
+    Register generated test files in the appropriate test suite loader
+    so Karma can discover and run them.
+
+    Creates a dedicated loader file (generatedTests.qunit.js) that imports
+    all generated test modules, and registers it in the main test suite HTML.
+    """
+    if not tests:
+        return
+
+    # Derive the UI5 module path prefix from manifest.json
+    app_namespace = _get_app_namespace(repo_root)
+    # Convert test_dir_rel (e.g., "webapp/test/integration") to module path
+    # Strip "webapp/" prefix for module paths
+    module_base = test_dir_rel.replace("webapp/", "").replace("/", "/")
+
+    # Build the list of generated test module paths
+    test_modules = []
+    for test in tests:
+        # Remove .js extension for sap.ui.require module path
+        module_name = test.file_name.replace(".js", "")
+        module_path = f"{app_namespace}/{module_base}/{module_name}"
+        test_modules.append(module_path)
+
+    # Create a dedicated generated tests loader file
+    loader_content = _build_generated_tests_loader(test_modules)
+    loader_path = os.path.join(repo_root, test_dir_rel, "generatedTests.qunit.js")
+    with open(loader_path, "w", encoding="utf-8") as f:
+        f.write(loader_content)
+    logger.info(f"Created generated tests loader: {loader_path}")
+
+    # Create the HTML file that Karma will use to run these tests
+    loader_html_path = os.path.join(repo_root, test_dir_rel, "generatedTests.qunit.html")
+    html_content = _build_generated_tests_html(app_namespace, module_base)
+    with open(loader_html_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    logger.info(f"Created generated tests HTML: {loader_html_path}")
+
+    # Update the main test suite to include the generated tests page
+    _update_testsuite(repo_root, test_dir_rel)
+
+
+def _get_app_namespace(repo_root: str) -> str:
+    """Get the app namespace from manifest.json, converted to module path format."""
+    for root, dirs, files in os.walk(repo_root):
+        if "node_modules" in root or ".git" in root:
+            continue
+        if "manifest.json" in files:
+            try:
+                with open(os.path.join(root, "manifest.json"), "r") as f:
+                    manifest = json.load(f)
+                app_id = manifest.get("sap.app", {}).get("id", "")
+                if app_id:
+                    return app_id.replace(".", "/")
+            except (json.JSONDecodeError, IOError):
+                pass
+    return "com/demo/fioriapp"
+
+
+def _build_generated_tests_loader(test_modules: list[str]) -> str:
+    """Build the JS loader file that imports all generated test modules."""
+    modules_str = ",\n    ".join(f'"{m}"' for m in test_modules)
+    return f'''sap.ui.require([
+    {modules_str}
+], function () {{
+    "use strict";
+    QUnit.start();
+}});
+'''
+
+
+def _build_generated_tests_html(app_namespace: str, module_base: str) -> str:
+    """Build the QUnit HTML page for running generated tests."""
+    # Calculate relative path to webapp root from test directory
+    depth = module_base.count("/") + 1
+    relative_root = "/".join([".."] * depth)
+
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Generated Tests - Auto PR Testing</title>
+    <script
+        id="sap-ui-bootstrap"
+        src="https://sdk.openui5.org/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-resourceroots=\'{{
+            "{app_namespace.replace("/", ".")}": "{relative_root}/"
+        }}\'
+        data-sap-ui-async="true">
+    </script>
+    <link rel="stylesheet" type="text/css" href="https://sdk.openui5.org/resources/sap/ui/thirdparty/qunit-2.css">
+    <script src="https://sdk.openui5.org/resources/sap/ui/thirdparty/qunit-2.js"></script>
+    <script src="https://sdk.openui5.org/resources/sap/ui/qunit/qunit-junit.js"></script>
+    <script src="generatedTests.qunit.js"></script>
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+</body>
+</html>
+'''
+
+
+def _update_testsuite(repo_root: str, test_dir_rel: str) -> None:
+    """Add the generated tests page to the main test suite if not already present."""
+    testsuite_path = os.path.join(repo_root, "webapp", "test", "testsuite.qunit.html")
+    if not os.path.isfile(testsuite_path):
+        return
+
+    with open(testsuite_path, "r") as f:
+        content = f.read()
+
+    # Check if generated tests page is already registered
+    generated_page = f"{test_dir_rel.replace('webapp/', 'test/')}/generatedTests.qunit.html"
+    if generated_page in content:
+        return
+
+    # Insert the generated tests page into the test suite
+    insert_marker = 'return oSuite;'
+    if insert_marker in content:
+        new_line = f'            oSuite.addTestPage("{generated_page}");\n            '
+        content = content.replace(insert_marker, new_line + insert_marker)
+        with open(testsuite_path, "w") as f:
+            f.write(content)
+        logger.info(f"Registered generated tests in testsuite.qunit.html")
