@@ -1,8 +1,10 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
+    "sap/m/MessageBox",
+    "sap/m/MessageToast",
     "com/demo/fioriapp/model/formatter"
-], function (Controller, JSONModel, formatter) {
+], function (Controller, JSONModel, MessageBox, MessageToast, formatter) {
     "use strict";
 
     return Controller.extend("com.demo.fioriapp.controller.Main", {
@@ -63,6 +65,39 @@ sap.ui.define([
             var oModel = this.getView().getModel("view");
             var iCount = oModel.getProperty("/itemCount");
             oModel.setProperty("/itemCount", iCount + 1);
+            MessageToast.show("Item added successfully");
+        },
+
+        onDeleteItem: function (oEvent) {
+            var oItem = oEvent.getParameter("listItem");
+            var sPath = oItem.getBindingContext().getPath();
+            var oModel = this.getView().getModel();
+            var that = this;
+
+            MessageBox.confirm("Are you sure you want to delete this item?", {
+                title: "Confirm Deletion",
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.OK) {
+                        oModel.remove(sPath, {
+                            success: function () {
+                                MessageToast.show("Item deleted successfully");
+                                that._updateItemCount();
+                            },
+                            error: function () {
+                                MessageBox.error("Failed to delete item. Please try again.");
+                            }
+                        });
+                    }
+                }
+            });
+        },
+
+        _updateItemCount: function () {
+            var oModel = this.getView().getModel("view");
+            var iCount = oModel.getProperty("/itemCount");
+            if (iCount > 0) {
+                oModel.setProperty("/itemCount", iCount - 1);
+            }
         },
 
         formatItemCount: function (iCount) {
