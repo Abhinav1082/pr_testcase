@@ -28,16 +28,20 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
 
       - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "npm"
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Install Chrome for Karma tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable || true
+          echo "CHROME_BIN=$(which google-chrome-stable || which google-chrome || which chromium-browser)" >> $GITHUB_ENV
 
       - name: Configure git identity
         run: |
@@ -53,6 +57,7 @@ jobs:
           AICORE_AUTH_URL: ${{ secrets.SAP_AI_CORE_AUTH_URL }}
           AICORE_CLIENT_ID: ${{ secrets.SAP_AI_CORE_CLIENT_ID }}
           AICORE_CLIENT_SECRET: ${{ secrets.SAP_AI_CORE_CLIENT_SECRET }}
-          AICORE_API_BASE: ${{ secrets.SAP_AI_CORE_API_BASE }}
+          AICORE_BASE_URL: ${{ secrets.SAP_AI_CORE_API_BASE }}
           AICORE_RESOURCE_GROUP: ${{ secrets.SAP_AI_CORE_RESOURCE_GROUP }}
+          CHROME_BIN: ${{ env.CHROME_BIN }}
         run: python scripts/main.py

@@ -36,7 +36,9 @@
                     noDataText="{i18n>noDataText}"
                     busy="{view>/busy}"
                     growing="true"
-                    growingThreshold="20">
+                    growingThreshold="20"
+                    mode="Delete"
+                    delete=".onDeleteItem">
                     <StandardListItem
                         title="{Name}"
                         description="{Description}"

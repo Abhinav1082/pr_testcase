@@ -38,6 +38,15 @@ def commit_tests(written_files: list[str], pr_number: int, repo_root: str) -> bo
                 text=True,
             )
 
+        # Also stage any generated loader/suite files
+        subprocess.run(
+            ["git", "add", "--all", "webapp/test/"],
+            cwd=repo_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
         # Check if there are staged changes
         result = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],
@@ -51,7 +60,7 @@ def commit_tests(written_files: list[str], pr_number: int, repo_root: str) -> bo
             return False
 
         # Commit
-        commit_msg = f"chore: add auto-generated OPA5/QUnit tests for PR #{pr_number}"
+        commit_msg = f"chore: add auto-generated OPA5/QUnit tests for PR #{pr_number} [skip ci]"
         subprocess.run(
             ["git", "commit", "-m", commit_msg],
             cwd=repo_root,
