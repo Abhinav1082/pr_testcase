@@ -11,8 +11,10 @@ permissions:
 jobs:
   auto-test:
     runs-on: ubuntu-latest
-    # Skip if the commit was made by the bot itself (prevents infinite loops)
-    if: github.event.pull_request.user.login != 'github-actions[bot]' && !contains(github.event.head_commit.message, 'chore: add auto-generated')
+    # Skip if the PR was opened by the bot itself (prevents infinite loops)
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      !contains(github.event.pull_request.title, '[auto-test-skip]')
 
     steps:
       - name: Checkout repository
